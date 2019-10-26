@@ -3,3 +3,7 @@ Lets you connect Skype, Battle.net, League Of Legends accounts with custom infor
 
 # USAGE
 You will need to install requirements to run the script you can do that by using a command ```pip install -r requirements.txt```. After that you can simply do ```python main.py from the console or double clicking the file if your system supports that.
+
+## Built with ❤️ by
+
+* [Aldas](https://github.com/AXDZ) - The creator of the script
