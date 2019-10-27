@@ -1,4 +1,5 @@
 time
 requests
+colorama
 termcolor
 getpass
