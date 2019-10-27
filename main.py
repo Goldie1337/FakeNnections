@@ -8,9 +8,14 @@ try:
 	import json
 	import time
 	import requests
+	from colorama import init
 	from termcolor import colored
 	from getpass import getpass
 	
+	#to make colors work on windows
+	init()
+
+
 	#function to login to check if token is valid
 	def checktoken(token):
 		"""checks if token is valid"""
