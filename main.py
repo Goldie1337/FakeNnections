@@ -1,131 +1,103 @@
-#!/usr/bin/env python3
+#imports all the modules that we will need
+from subprocess import call
+import sys
+from sys import platform
+import asyncio
+import requests
+import asyncio
+from termcolor import colored
+from colorama import init
+from proxyscrape import create_collector
+from fake_useragent import UserAgent
 
-# FakeNnections
-# Author: Aldas - https://github.com/axdz
+#gets useragent that we could use
+ua = UserAgent()
 
-try:
-	#importing requirements
-	import json
-	import time
-	import requests
-	from colorama import init
-	from termcolor import colored
-	from getpass import getpass
-	
-	#to make colors work on windows
-	init()
+#makes proxies collector
+collector = create_collector('my-collector', 'https')
 
+#Makes this work for windows
+init()
 
-	#function to login to check if token is valid
-	def checktoken(token):
-		"""checks if token is valid"""
-		headers = {
-		"authorization": token
-		}
-		src = requests.get('https://discordapp.com/api/v6/auth/login', headers=headers)
-		global tokenvalid
-		if src.status_code == 200:
-			print(colored('Token is valid', 'green'))
-			tokenvalid = True
-		else:
-			print(colored('Token is invalid', 'red'))
-			tokenvalid = False
-			
-	
-	#function for connecting
-	def connect(token, type, id, name):
-		"""function to add the connection"""
-		url = f'https://canary.discordapp.com/api/v6/users/@me/connections/{type}/{id}'
-		
-		data = {'name': name,
-		 			'visibility': 1
-		 			}
-		
-		headers = {'content-type':'application/json', 
-		'authorization':token
-		}
-		
-		response = requests.put(url, data=json.dumps(data), headers=headers)
-		if response.status_code == 200:
-			print(colored(f'Connected {type} with username "{name}"', "green"))
-		elif response.status_code == 401:
-			print(colored('Authorization error!', 'red'))
-		else:
-			print(colored('Error has occured it seems like', 'red'))
-			print(response.text)
-	
-	
-	#token
-	token_input = True
-	while token_input:
-		try:
-			usertoken = getpass(f"[{colored('*', 'red')}] Token: ")
-			checktoken(usertoken)
-			if tokenvalid == True:
-				token_input = False
-			else:
-				continue
-		except Exception:
-			print('Error has occured!')
-	
-	
-	#options for connections
-	options_menu = True
-	while options_menu:
-		try:
-			print(f"[{colored('1', 'magenta')}] Skype")
-			print(f"[{colored('2', 'magenta')}] Battle.net")
-			print(f"[{colored('3', 'magenta')}] League of Legends")
-			userchoice = int(input('> '))
-			if userchoice == 1:
-				choice = 'skype'
-				options_menu = False
-			elif userchoice == 2:
-				choice = 'battlenet'
-				options_menu = False
-			elif userchoice == 3:
-				choice = 'leagueoflegends'
-				options_menu = False
-			else:
-				print(colored('Invalid choice!', 'red'))
-				continue
-			
-			
-		except ValueError:
-			print(colored('Invalid choice!', 'red'))
-			continue
-			
-		except KeyboardInterrupt:
-			print(colored('Bye!', 'green'))
-			exit()
-	
-	
-	#name input for connection
-	print(colored('Just press enter if you wanna have an invisible name', 'magenta'))
-	name = input(f"[{colored('*', 'red')}] Name: ")
-	if name == '':
-		name = "ㅤ"
-	else:
-		pass
-	
-	
-	#id of the connection
-	print(colored('Just press enter if you want it to generate an id', 'magenta'))
-	id = input(f"[{colored('+', 'green')}] Id: ")
-	if id == '':
-		id = round(time.time() * 1)
-	else:
-		pass
-	
-	#executes the function to add the connection based on all the other options
-	connect(usertoken, choice, id, name)
+#Sets console title
+sys.stdout.write("\x1b]2;NameMC ViewBot by Aldas\x07")
 
-#if user tries to close the script by using CTRL + C combination
-except KeyboardInterrupt:
-	print(colored('\nBye!', 'green'))
-	exit()
-	
-#if some packages arent installed
-except ImportError:
-	print('''Please install packages from requirements.txt
-Use command "pip install -r requirements.txt" to install all the required plugins''')
+#clears terminal by using command in the shell
+def clear():
+    if platform not in ('win32', 'cygwin'):
+        command = 'clear'
+    else:
+        command = 'cls'
+    try:
+        call(command, shell=True)
+    except OSError as e:
+        pass
+
+#function to view profiles
+async def view(username, number=None, proxies=None, headers=None, timeout=None):
+    if number == None:
+        r = requests.get(f"https://namemc.com/profile/{username}", headers=headers, proxies=proxies, timeout=timeout)
+        return r.status_code
+    else:
+        r = requests.get(f"https://namemc.com/profile/{username}.{number}", headers=headers, proxies=proxies, timeout=timeout)
+        return r.status_code
+
+#prints the banner
+print(colored('''
+_  _                __  __     __   ___              ___      _   
+| \| |__ _ _ __  ___|  \/  |__  \ \ / (_)_____ __ __ | _ ) ___| |_ 
+| .` / _` | '  \/ -_) |\/| / _|  \ V /| / -_) V  V / | _ \/ _ \  _|
+|_|\_\__,_|_|_|_\___|_|  |_\__|   \_/ |_\___|\_/\_/  |___/\___/\__|
+                        By Aldas | Version 1.0
+''', "magenta"))
+
+#makes an loop
+name_input = True
+while name_input:
+    #tries to execute this username input code
+    try:
+        #username input
+        username = input(f"[{colored('*', 'red')}] Username: ")
+        #if user presses enter
+        if username == "":
+            continue
+        #if user enters anything else
+        else:
+            pass
+        
+        #prints text to let users know that its not really needed
+        print(colored("Press enter for 1 (default) as user number", "magenta"))
+        #user number input
+        usernumber = input(f"[{colored('+', 'green')}] User number incase needed: ")
+        #if user presses enter (skips)
+        if usernumber == "":
+            usernameid = None
+        #if user enters anything else
+        else:
+            pass
+        
+        #defines proxy
+        proxy = collector.get_proxy()
+        proxy = f"{proxy[0]}:{proxy[1]}"
+        #sends a reuqest
+        r_status_code = asyncio.run(view(username=username, number=usernumber, proxies={"https":proxy}, headers={'user-agent': ua.random}, timeout=10))
+        #if we get 200 as a status code (success)
+        if r_status_code == 200:
+            sviews += 1
+            print(colored(f"[{sviews} sent]", "magenta") + " " + colored('Successfully sent a view', 'green'))
+        #if 404 error occurs (page not found error)
+        elif r_status_code == 404:
+            print(colored("No such a profile", "red"))
+            exit()
+        #if request status code is something else
+        else:
+            print(colored(f"Sent a request and got status code of {r_status_code}", "magenta"))
+                
+    #if you press ctrl + c
+    except KeyboardInterrupt:
+        print(colored("Bye!", "green"))
+        exit()
+    
+    #if any other error occurs
+    except Exception as e:
+        print(f"{e}\n{colored('Error has occured! ^')}")
